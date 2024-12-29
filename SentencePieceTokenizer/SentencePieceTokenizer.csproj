@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <ProjectGuid>DEFAC880-35FA-4D85-8A5F-00CE938854AA</ProjectGuid>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <OutputType>Library</OutputType>
+        <IsTrimmable>false</IsTrimmable>
+        <IsAotCompatible>false</IsAotCompatible>
+        <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+        <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
+        <EnableAotAnalyzer>true</EnableAotAnalyzer>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageVersion>0.1.0</PackageVersion>
+        <Title>SentencePieceTokenizer</Title>
+        <PackageId>SentencePieceTokenizer</PackageId>
+        <Authors>Darcara</Authors>
+        <Copyright>Copyright (c) Darcara</Copyright>
+        <PackageTags>ai tokenizer wordpiece sentencepiece</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <Description>SentencePieceTokenizer is a wrapper around the google SentencePiece tokenizer. Used to tokenize text for language models and other NLP tasks.</Description>
+        <PackageProjectUrl>https://github.com/Darcara/SentencePieceTokenizer</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Darcara/SentencePieceTokenizer</RepositoryUrl>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedAllSources>true</EmbedAllSources>
+        <DebugType>portable</DebugType>
+
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Folder Include="runtimes\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\.gitignore" Link="Solution Files/.gitignore" Pack="false"/>
+        <Content Include="..\LICENSE" Link="Solution Files/LICENSE" Pack="true" PackagePath="."/>
+        <Content Include="..\README.md" Link="Solution Files/README.md" Pack="true" PackagePath="README.md"/>
+        <Content Include="runtimes/linux-x64/native/libsentencepiece.so" Pack="true" PackagePath="runtimes/linux-x64/native/"/>
+        <Content Include="runtimes/linux-x64/native/SentencePieceWrapper.so" Pack="true" PackagePath="runtimes/linux-x64/native/"/>
+
+        <Content Include="runtimes/win-x64/native/sentencepiece.lib" Pack="true" PackagePath="runtimes/win-x64/native/"/>
+        <Content Include="runtimes/win-x64/native/SentencePieceWrapper.dll" Pack="true" PackagePath="runtimes/win-x64/native/"/>
+
+        <InternalsVisibleTo Include="SentencePieceTokenizer.Test"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="protobuf-net" Version="3.2.45" />
+        <PackageReference Include="System.Numerics.Tensors" Version="9.0.0"/>
+    </ItemGroup>
+
+</Project>
