@@ -19,41 +19,32 @@ public static class HugginFaceHack {
 	}
 
 	// This feels wrong
-	public static unsafe void ConvertToInt64AndAdd1(Int32[] tokens, Int64[] target, Int32 targetOffset) {
-		//tokens.Select(i => (Int64)i + 1).ToArray().CopyTo(target.AsSpan(targetOffset));
-		ArgumentOutOfRangeException.ThrowIfLessThan(target.Length, tokens.Length + targetOffset);
-
-		// fixed (Int64* targetPtr = target)
+	public static unsafe void ConvertToInt64AndAdd1(ReadOnlySpan<Int32> tokens, Span<Int64> target) {
+		ArgumentOutOfRangeException.ThrowIfLessThan(target.Length, tokens.Length);
 		fixed (Int32* tokenPtr = tokens) {
 			Int32* ptr = tokenPtr;
 			Int32 tokensRemaining = tokens.Length;
 
 			if (Avx2.IsSupported && Vector256.IsHardwareAccelerated) {
-				// we can add / convert 8 integers at a time
-
 				Vector256<Int32> addMe = Vector256<Int32>.One;
 
 				while (tokensRemaining >= Vector256<Int32>.Count) {
 					Vector256<Int32> sourceTokens = Vector256.Load(ptr);
 					Vector256<Int32> addResult = Avx2.Add(sourceTokens, addMe);
 
-					Vector256<Int64> result = Avx2.ConvertToVector256Int64(addResult.GetLower());
-					result.StoreUnsafe(ref target[targetOffset]);
-					targetOffset += Vector256<Int64>.Count;
-
-					result = Avx2.ConvertToVector256Int64(addResult.GetUpper());
-					result.StoreUnsafe(ref target[targetOffset]);
-					targetOffset += Vector256<Int64>.Count;
+					(Vector256<Int64> lower, Vector256<Int64> upper) = Vector256.Widen(addResult);
+					lower.CopyTo(target);
+					upper.CopyTo(target.Slice(Vector256<Int64>.Count));
+					target = target.Slice(Vector256<Int64>.Count * 2);
 
 					ptr += Vector256<Int32>.Count;
 					tokensRemaining -= Vector256<Int32>.Count;
 				}
 			}
 
-			while (tokensRemaining > 0) {
-				target[targetOffset++] = (Int64)((*ptr) + 1);
+			for (Int32 i = 0; i < target.Length; ++i) {
+				target[i] = *ptr + 1L;
 				++ptr;
-				--tokensRemaining;
 			}
 		}
 	}

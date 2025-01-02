@@ -44,7 +44,7 @@ public class HuggingFaceHackTests {
 			data[i] = Random.Shared.Next();
 		}
 		
-		HugginFaceHack.ConvertToInt64AndAdd1(data, output, 0);
+		HugginFaceHack.ConvertToInt64AndAdd1(data, output);
 
 		output.Should().BeEquivalentTo(data.Select(i => i + 1).ToArray());
 	}
