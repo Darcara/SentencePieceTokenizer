@@ -39,13 +39,16 @@ public class HuggingFaceHackTests {
 	[Test]
 	public void AddsCorrectlyAndCastsToInt64() {
 		Int32[] data = new Int32[1026];
-		Int64[] output = new Int64[1026];
+		Int64[] output = new Int64[2048];
 		for (var i = 0; i < data.Length; i++) {
 			data[i] = Random.Shared.Next();
 		}
+		Array.Fill(output, -1);
 		
-		HugginFaceHack.ConvertToInt64AndAdd1(data, output);
+		HugginFaceHack.ConvertToInt64AndAdd1(data, output.AsSpan(55));
 
-		output.Should().BeEquivalentTo(data.Select(i => i + 1).ToArray());
+		output.Skip(55).Take(data.Length).Should().BeEquivalentTo(data.Select(i => i + 1));
+		output.Take(55).Should().AllBeEquivalentTo(-1);
+		output.Skip(55 + data.Length).Should().AllBeEquivalentTo(-1);
 	}
 }

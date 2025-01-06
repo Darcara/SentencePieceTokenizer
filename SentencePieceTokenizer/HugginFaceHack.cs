@@ -42,7 +42,7 @@ public static class HugginFaceHack {
 				}
 			}
 
-			for (Int32 i = 0; i < target.Length; ++i) {
+			for (Int32 i = 0; i < tokensRemaining; ++i) {
 				target[i] = *ptr + 1L;
 				++ptr;
 			}
