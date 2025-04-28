@@ -11,6 +11,8 @@
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
         <EnableAotAnalyzer>true</EnableAotAnalyzer>
+        <AnalysisLevel>latest-all</AnalysisLevel>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
@@ -29,8 +31,9 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedAllSources>true</EmbedAllSources>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PublishDocumentationFile>true</PublishDocumentationFile>
         <DebugType>portable</DebugType>
-
     </PropertyGroup>
 
     <ItemGroup>
@@ -51,8 +54,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="protobuf-net" Version="3.2.45" />
-        <PackageReference Include="System.Numerics.Tensors" Version="9.0.0"/>
+        <PackageReference Include="protobuf-net" Version="3.2.52" />
+        <PackageReference Include="System.Numerics.Tensors" Version="9.0.4" />
     </ItemGroup>
 
 </Project>
