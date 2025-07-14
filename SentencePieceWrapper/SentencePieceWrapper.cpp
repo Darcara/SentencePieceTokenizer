@@ -32,12 +32,12 @@ EXPORT int LoadModel(void* processorHandle, const char* filename, int* bos, int*
 }
 
 
-EXPORT int EncodeAsSpans(void* processorHandle, const char* input, int* outputIds, uint64_t* outputSpans, int capacity, int* length)
+EXPORT int EncodeAsSpans(void* processorHandle, const char* input, const int inputLength, int* outputIds, uint64_t* outputSpans, int capacity, int* length)
 {
     const auto processor = static_cast<sentencepiece::SentencePieceProcessor*>(processorHandle);
 
-    std::string_view inputView(input);
     sentencepiece::ImmutableSentencePieceText spt;
+    std::string_view inputView(input, inputLength);
     const sentencepiece::util::Status status = processor->Encode(inputView, spt.mutable_proto());
 
     // nothing we can do on error
@@ -64,12 +64,13 @@ EXPORT int EncodeAsSpans(void* processorHandle, const char* input, int* outputId
     return 0; // sentencepiece::util::StatusCode::kOk
 }
 
-EXPORT int EncodeAsIds(void* processorHandle, const char* input, int* output, int capacity, int* length)
+EXPORT int EncodeAsIds(void* processorHandle, const char* input, const int inputLength, int* output, int capacity, int* length)
 {
     const auto processor = static_cast<sentencepiece::SentencePieceProcessor*>(processorHandle);
 
     std::vector<int> pieces;
-    const sentencepiece::util::Status status = processor->Encode(input, &pieces);
+    std::string_view inputView(input, inputLength);
+    const sentencepiece::util::Status status = processor->Encode(inputView, &pieces);
 
     // nothing we can do on error
     if (status.code() != sentencepiece::util::StatusCode::kOk)
@@ -86,11 +87,12 @@ EXPORT int EncodeAsIds(void* processorHandle, const char* input, int* output, in
     return 0; // sentencepiece::util::StatusCode::kOk
 }
 
-EXPORT int EncodeAsPieces(void* processorHandle, const char* input, char* output, int capacity, int* length, int* numberOfTokens)
+EXPORT int EncodeAsPieces(void* processorHandle, const char* input, const int inputLength, char* output, int capacity, int* length, int* numberOfTokens)
 {
     const auto processor = static_cast<sentencepiece::SentencePieceProcessor*>(processorHandle);
     std::vector<std::string> pieces;
-    const sentencepiece::util::Status status = processor->Encode(input, &pieces);
+    std::string_view inputView(input, inputLength);
+    const sentencepiece::util::Status status = processor->Encode(inputView, &pieces);
     const size_t lcapacity = capacity;
 
     // nothing we can do on error
