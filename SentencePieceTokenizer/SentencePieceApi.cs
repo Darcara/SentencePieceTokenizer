@@ -1,9 +1,11 @@
 ﻿namespace SentencePieceTokenizer;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
+[SuppressMessage("Security", "CA5393:Do not use unsafe DllImportSearchPath value")]
 internal static partial class SentencePieceApi {
 	internal const String LibraryName = "SentencePieceWrapper";
 	
@@ -39,24 +41,31 @@ internal static partial class SentencePieceApi {
 	}
 
 	[LibraryImport(LibraryName)]
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
 	public static partial IntPtr CreateProcessor();
 
 	[LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
 	public static partial StatusCode LoadModel(IntPtr processorHandle, String filename, out Int32 bos, out Int32 eos, out Int32 pad, out Int32 unk, out Int32 size);
 
 	[LibraryImport(LibraryName)]
-	public static partial StatusCode EncodeAsSpans(IntPtr processorHandle, IntPtr input, IntPtr outputIds, IntPtr outputSpans, Int32 capacity, out Int32 length);
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+	public static partial StatusCode EncodeAsSpans(IntPtr processorHandle, IntPtr input, Int32 inputLength, IntPtr outputIds, IntPtr outputSpans, Int32 capacity, out Int32 length);
 
 	[LibraryImport(LibraryName)]
-	public static partial StatusCode EncodeAsIds(IntPtr processorHandle, IntPtr input, IntPtr output, Int32 capacity, out Int32 length);
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+	public static partial StatusCode EncodeAsIds(IntPtr processorHandle, IntPtr input, Int32 inputLength, IntPtr output, Int32 capacity, out Int32 length);
 
 	[LibraryImport(LibraryName)]
-	public static partial StatusCode EncodeAsPieces(IntPtr processorHandle, IntPtr input, IntPtr output, Int32 capacity, out Int32 length, out Int32 numberOfTokens);
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
+	public static partial StatusCode EncodeAsPieces(IntPtr processorHandle, IntPtr input, Int32 inputLength, IntPtr output, Int32 capacity, out Int32 length, out Int32 numberOfTokens);
 
 	[LibraryImport(LibraryName)]
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
 	public static partial StatusCode DecodeIds(IntPtr processorHandle, IntPtr input, Int32 numberOfIds, IntPtr output, Int32 capacity, out Int32 length);
 	
 	[LibraryImport(LibraryName)]
+	[DefaultDllImportSearchPaths(DllImportSearchPath.AssemblyDirectory)]
 	public static partial void DisposeProcessor(IntPtr processorHandle);
 
 	public static unsafe IntPtr ConvertStringToNativeUtf8(ReadOnlySpan<Char> managedString, out Int32 numBytes) {

@@ -2,6 +2,7 @@
 
 using System;
 using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -9,14 +10,20 @@ using System.Text;
 /// 
 /// </summary>
 /// <remarks>Should be thread-safe, as SentencePiece itself is thread-safe, but that has not been extensivly tested.</remarks>
+[SuppressMessage("Naming", "CA1724:Type names should not match namespaces")]
 public class SentencePieceTokenizer : ITokenizer<Int32> {
 	private IntPtr _processorHandle;
-
+	/// <inheritdoc />
 	public Int32 UnknownToken { get; init; }
+	/// <inheritdoc />
 	public Int32 BeginOfSentenceToken { get; init; }
+	/// <inheritdoc />
 	public Int32 EndOfSentenceToken { get; init; }
+	/// <inheritdoc />
 	public Int32 PadToken { get; init; }
+	/// <inheritdoc />
 	public Int32 MaskToken { get; init; }
+	/// <inheritdoc />
 	public Int32 NumberOfTokens { get; init; }
 
 	public SentencePieceTokenizer(String modelFile) {
@@ -45,7 +52,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 	private Byte[] TokenizeToDelimitedUtf8(ReadOnlySpan<Char> data, out Int32 length, out Int32 numberOfTokens) {
 		IntPtr inputPtr = SentencePieceApi.ConvertStringToNativeUtf8(data, out Int32 numBytes);
 		try {
-			return TokenizeToDelimitedUtf8(inputPtr, data.Length, out length, out numberOfTokens);
+			return TokenizeToDelimitedUtf8(inputPtr, numBytes, out length, out numberOfTokens);
 		}
 		finally {
 			Marshal.FreeHGlobal(inputPtr);
@@ -64,7 +71,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 		Int32 capacity = Math.Max(512, numberOfBytes * 2);
 		IntPtr outputPtr = Marshal.AllocHGlobal(capacity);
 		try {
-			SentencePieceApi.StatusCode code = SentencePieceApi.EncodeAsPieces(_processorHandle, inputPtr, outputPtr, capacity, out length, out numberOfTokens);
+			SentencePieceApi.StatusCode code = SentencePieceApi.EncodeAsPieces(_processorHandle, inputPtr, numberOfBytes, outputPtr, capacity, out length, out numberOfTokens);
 			if (code != SentencePieceApi.StatusCode.Ok)
 				throw new InvalidOperationException($"Error occurred while encoding, code: {code}.");
 
@@ -72,7 +79,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 			if (length > capacity) {
 				capacity = length;
 				outputPtr = Marshal.ReAllocHGlobal(outputPtr, capacity);
-				code = SentencePieceApi.EncodeAsPieces(_processorHandle, inputPtr, outputPtr, capacity, out length, out numberOfTokens);
+				code = SentencePieceApi.EncodeAsPieces(_processorHandle, inputPtr, numberOfBytes, outputPtr, capacity, out length, out numberOfTokens);
 				if (code != SentencePieceApi.StatusCode.Ok)
 					throw new InvalidOperationException($"Error occurred while encoding, code: {code}.");
 			}
@@ -90,7 +97,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 		}
 	}
 
-	private String[] SplitTokenizedUtf8IntoStrings(ReadOnlySpan<Byte> buffer, Int32 numberOfTokens) {
+	private static String[] SplitTokenizedUtf8IntoStrings(ReadOnlySpan<Byte> buffer, Int32 numberOfTokens) {
 		// The following is basically
 		// return length == 0 || numberOfTokens == 0 ? [] : Encoding.UTF8.GetString(buffer, 0, length).Split(' ');
 		String[] ret = new String[numberOfTokens];
@@ -149,7 +156,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 		Int32 capacityBytes = Math.Max(512, capacityItems * sizeof(Int32));
 		IntPtr outputPtr = Marshal.AllocHGlobal(capacityBytes);
 		try {
-			SentencePieceApi.StatusCode code = SentencePieceApi.EncodeAsIds(_processorHandle, inputPtr, outputPtr, capacityItems, out Int32 length);
+			SentencePieceApi.StatusCode code = SentencePieceApi.EncodeAsIds(_processorHandle, inputPtr, numBytes, outputPtr, capacityItems, out Int32 length);
 			if (code != SentencePieceApi.StatusCode.Ok)
 				throw new InvalidOperationException($"Error occurred while encoding, code: {code}.");
 
@@ -158,7 +165,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 				capacityItems = length;
 				capacityBytes = capacityItems * sizeof(Int32);
 				outputPtr = Marshal.ReAllocHGlobal(outputPtr, capacityBytes);
-				code = SentencePieceApi.EncodeAsIds(_processorHandle, inputPtr, outputPtr, capacityItems, out length);
+				code = SentencePieceApi.EncodeAsIds(_processorHandle, inputPtr, numBytes, outputPtr, capacityItems, out length);
 				if (code != SentencePieceApi.StatusCode.Ok)
 					throw new InvalidOperationException($"Error occurred while encoding, code: {code}.");
 			}
@@ -216,7 +223,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 			Int32 capacityBytes = Math.Max(512, capacityItems * (sizeof(TokenSpan) + sizeof(Int32)));
 			IntPtr outputPtr = Marshal.AllocHGlobal(capacityBytes);
 			try {
-				SentencePieceApi.StatusCode code = SentencePieceApi.EncodeAsSpans(_processorHandle, inputPtrForInterop, outputPtr, outputPtr + capacityItems * sizeof(Int32), capacityItems, out Int32 length);
+				SentencePieceApi.StatusCode code = SentencePieceApi.EncodeAsSpans(_processorHandle, inputPtrForInterop, utf8Bytes.Length, outputPtr, outputPtr + capacityItems * sizeof(Int32), capacityItems, out Int32 length);
 				if (code != SentencePieceApi.StatusCode.Ok)
 					throw new InvalidOperationException($"Error occurred while encoding, code: {code}.");
 
@@ -225,7 +232,7 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 					capacityItems = length;
 					capacityBytes = length * (sizeof(TokenSpan) + sizeof(Int32));
 					outputPtr = Marshal.ReAllocHGlobal(outputPtr, capacityBytes);
-					code = SentencePieceApi.EncodeAsSpans(_processorHandle, inputPtrForInterop, outputPtr, outputPtr + capacityItems * sizeof(Int32), capacityItems, out length);
+					code = SentencePieceApi.EncodeAsSpans(_processorHandle, inputPtrForInterop, utf8Bytes.Length, outputPtr, outputPtr + capacityItems * sizeof(Int32), capacityItems, out length);
 					if (code != SentencePieceApi.StatusCode.Ok)
 						throw new InvalidOperationException($"Error occurred while encoding, code: {code}.");
 				}
@@ -277,16 +284,21 @@ public class SentencePieceTokenizer : ITokenizer<Int32> {
 		if (handle != IntPtr.Zero)
 			SentencePieceApi.DisposeProcessor(_processorHandle);
 	}
+	
+	/// <inheritdoc cref="IDisposable.Dispose"/>
+	protected virtual void Dispose(Boolean disposing) {
+		ReleaseUnmanagedResources();
+	}
 
 	/// <inheritdoc />
 	public void Dispose() {
-		ReleaseUnmanagedResources();
+		Dispose(true);
 		GC.SuppressFinalize(this);
 	}
 
 	/// <inheritdoc />
 	~SentencePieceTokenizer() {
-		ReleaseUnmanagedResources();
+		Dispose(false);
 	}
 
 	#endregion

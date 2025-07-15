@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,20 +18,35 @@ using Sentencepiece;
 [JsonSerializable(typeof(Dictionary<String, Int64>))]
 internal partial class VocabularySerializerContext : JsonSerializerContext;
 
+
 public sealed class MarianTokenizer : ITokenizer<Int64> {
 	private readonly SentencePieceTokenizer _baseTokenizer;
 	private readonly String[] _idToTokenLookup;
 	private readonly Int64[] _idToIdLookup;
+	/// <inheritdoc />	
 	public Int64 UnknownToken { get; init; }
+	/// <inheritdoc />
 	public Int64 BeginOfSentenceToken { get; init; } = -1;
+	/// <inheritdoc />
 	public Int64 EndOfSentenceToken { get; init; }
+	/// <inheritdoc />
 	public Int64 PadToken { get; init; }
+	/// <inheritdoc />
 	public Int64 MaskToken { get; init; } = -1;
+	/// <inheritdoc />
 	public Int32 NumberOfTokens { get; init; }
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="modelFile"></param>
+	/// <param name="vocabFile"></param>
+	/// <exception cref="ArgumentException"></exception>
+	/// <exception cref="FileNotFoundException"></exception>
 	public MarianTokenizer(String modelFile, String vocabFile) {
 		ArgumentException.ThrowIfNullOrEmpty(vocabFile);
 		ArgumentException.ThrowIfNullOrEmpty(modelFile);
+		if (!File.Exists(modelFile)) throw new FileNotFoundException($"Model file not found: {modelFile} in {Path.GetFullPath(modelFile)}", modelFile);
 
 		_baseTokenizer = new SentencePieceTokenizer(modelFile);
 
@@ -47,7 +63,8 @@ public sealed class MarianTokenizer : ITokenizer<Int64> {
 		PadToken = vocabularyDictionary["<pad>"];
 
 		_idToIdLookup = new Int64[vocabularyDictionary.Count];
-		ModelProto modelProto = Serializer.Deserialize(File.OpenRead(modelFile), default(ModelProto)) ?? throw new ArgumentException("Unable to load model from file", nameof(modelFile));
+		using FileStream fileStream = File.OpenRead(modelFile);
+		ModelProto modelProto = Serializer.Deserialize(fileStream, default(ModelProto)) ?? throw new ArgumentException("Unable to load model from file", nameof(modelFile));
 		for (Int32 index = 0; index < modelProto.Pieces.Count; index++) {
 			ModelProto.SentencePiece modelProtoPiece = modelProto.Pieces[index];
 			if (modelProtoPiece.type != ModelProto.SentencePiece.Type.Normal) {
@@ -91,7 +108,7 @@ public sealed class MarianTokenizer : ITokenizer<Int64> {
 
 	/// <inheritdoc />
 	public String Decode(Int64 id) {
-		if (id < 0 || id > NumberOfTokens) throw new ArgumentOutOfRangeException(nameof(id));
+		if (id < 0 || id > NumberOfTokens) throw new ArgumentOutOfRangeException(nameof(id), id, $"Id({id}) must be 0 or greater and less than: {NumberOfTokens}");
 		return _idToTokenLookup[id];
 	}
 
@@ -135,8 +152,9 @@ public sealed class MarianTokenizer : ITokenizer<Int64> {
 
 	#region IDisposable
 
+	[SuppressMessage("ReSharper", "ConditionalAccessQualifierIsNonNullableAccordingToAPIContract", Justification = "May happen in .ctor-Exception")]
 	private void ReleaseUnmanagedResources() {
-		_baseTokenizer.Dispose();
+		_baseTokenizer?.Dispose();
 	}
 
 	/// <inheritdoc />
@@ -152,22 +170,3 @@ public sealed class MarianTokenizer : ITokenizer<Int64> {
 
 	#endregion
 }
-
-// #if NET9_0_OR_GREATER
-// public class ByteArrayComparer : IEqualityComparer<Byte[]> {
-// 	public Boolean Equals(Byte[]? left, Byte[]? right) {
-// 		if (ReferenceEquals(left, right))
-// 			return true;
-// 		if (left == null || right == null) return false;
-// 		
-// 		return new ReadOnlySpan<Byte>(left).SequenceEqual(right);
-// 	}
-// 	public Int32 GetHashCode(Byte[] key) {
-// 		// this is very specific to the vocabulary tokens.
-// 		// many tokens start with \u2581 '▁' = 0xE2 0x96 0x81 in UTF8
-// 		// Minimum token length is 1 for e.g. '.'
-// #error using only first and last seems to cause a lot of collisions. 
-// 		return key[0] | (key[key.Length-1] << 8);
-// 	}
-// }
-// #endif
