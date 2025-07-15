@@ -71,9 +71,9 @@ public static class Helper {
 	internal static void PrintColums(params (String header, IEnumerable data)[] columns) {
 		StringBuilder sb = new();
 		List<(Boolean padRight, Int32 padSize, List<String> data)> columnsWithData = [];
-		for (int index = 0; index < columns.Length; index++) {
-			(string header, IEnumerable data) column = columns[index];
-			List<string> evaluatedData = column.data.Cast<Object?>().Select(o => o?.ToString() ?? "?").ToList();
+		for (Int32 index = 0; index < columns.Length; index++) {
+			(String header, IEnumerable data) column = columns[index];
+			List<String> evaluatedData = column.data.Cast<Object?>().Select(o => o?.ToString() ?? "?").ToList();
 			Int32 maxSize = 1 + Math.Max(column.header.Length, evaluatedData.Max(o => o.ToString().Length));
 			Boolean padRight = column.header.StartsWith('-');
 			String headerToPrint = padRight ? ' ' + column.header.Substring(1).PadRight(maxSize) : column.header.PadLeft(maxSize) + " ";
@@ -83,9 +83,9 @@ public static class Helper {
 
 		sb.AppendLine();
 		Int32 maxData = columnsWithData.Max(tpl => tpl.data.Count);
-		for (int idx = 0; idx < maxData; idx++) {
+		for (Int32 idx = 0; idx < maxData; idx++) {
 			foreach ((Boolean padRight, Int32 padSize, List<String> data) in columnsWithData) {
-				String dataToPrint = idx >= data.Count ? "-" : data[idx];
+				String dataToPrint = idx >= data.Count ? "???" : data[idx];
 				sb.Append(padRight ? ' ' + dataToPrint.PadRight(padSize) : dataToPrint.PadLeft(padSize) + ' ');
 			}
 

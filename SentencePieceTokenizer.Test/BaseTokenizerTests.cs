@@ -97,6 +97,38 @@ public abstract class BaseTokenizerTests<T> where T : struct, INumber<T> {
 
 		tokens.Should().HaveCount(stringTokens.Length);
 	}
+	
+	[Test]
+	public void TokenizesPartialTextToId() {
+		using ITokenizer<T> tok = Create();
+		String text = TestData.ExampleText.ShortSentence.Substring(4);
+		// became
+		T[] tokens = tok.EncodeToIds(text.AsSpan(9, 6));
+		String[] stringTokens = tok.EncodeToStrings(text.AsSpan(9, 6));
+
+		Console.WriteLine($"Text:{text.Length} --> Tokens: {tokens.Length} = TextPerToken: {text.Length / (Double)tokens.Length:N3}");
+		for (Int32 i = 0; i < tokens.Length; i++) {
+			Console.WriteLine($"{tokens[i],7}: {stringTokens[i]}");
+		}
+
+		tokens.Should().HaveCount(stringTokens.Length);
+	}
+	
+	[Test]
+	public void TokenizesPartialUtf8ToId() {
+		using ITokenizer<T> tok = Create();
+		Byte[] utf8 = MagicNumbers.Utf8NoBom.GetBytes(TestData.ExampleText.ShortSentence);
+		// became
+		T[] tokens = tok.EncodeToIds(utf8.AsSpan(13, 6));
+		String[] stringTokens = tok.EncodeToStrings(utf8.AsSpan(13, 6));
+
+		Console.WriteLine($"Bytes:{utf8.Length} --> Tokens: {tokens.Length} = BytesPerToken: {utf8.Length / (Double)tokens.Length:N3}");
+		for (Int32 i = 0; i < tokens.Length; i++) {
+			Console.WriteLine($"{tokens[i],7}: {stringTokens[i]}");
+		}
+
+		tokens.Should().HaveCount(stringTokens.Length);
+	}
 
 	[TestCaseSource(typeof(TestData.ExampleText), nameof(TestData.ExampleText.NonStandardTexts))]
 	public void TokenizesNonStandardToSpans(String text) {
