@@ -2,6 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SentencePieceWrapper", "SentencePieceWrapper.vcxproj", "{DC6643A1-6BF4-4285-8910-B175B66BB211}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFiles", "SolutionFiles", "{07EE4537-67DE-4820-A196-017F6EFA3B79}"
+	ProjectSection(SolutionItems) = preProject
+		..\Dockerfiles\BuildWrapper.Dockerfile = ..\Dockerfiles\BuildWrapper.Dockerfile
+		..\Dockerfiles\BuildWrapper.Dockerfile.dockerignore = ..\Dockerfiles\BuildWrapper.Dockerfile.dockerignore
+		..\Dockerfiles\BuildWrapper.cmd = ..\Dockerfiles\BuildWrapper.cmd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

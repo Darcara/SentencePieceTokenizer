@@ -4,10 +4,11 @@
 #include "sentencepiece_processor.h"
 
 #if defined _MSC_VER
-#pragma comment(lib, "sentencepiece")
-#define EXPORT extern "C" __declspec(dllexport)
+    #pragma comment(lib, "sentencepiece")
+    #define EXPORT extern "C" __declspec(dllexport)
 #else
-    #define EXPORT __attribute__((visibility("default")))
+    #pragma comment(lib, "sentencepiece")
+    #define EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 
 EXPORT void* CreateProcessor()

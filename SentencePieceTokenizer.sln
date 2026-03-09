@@ -4,6 +4,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentencePieceTokenizer", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentencePieceTokenizer.Test", "SentencePieceTokenizer.Test\SentencePieceTokenizer.Test.csproj", "{A2884AB4-3F7F-4FFC-8D44-3B0F825F1C3A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{DCFB9766-D890-4CFA-BC99-768431A7A0A1}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+		Dockerfiles\TestWrapper.Dockerfile = Dockerfiles\TestWrapper.Dockerfile
+		Dockerfiles\TestWrapper.Dockerfile.dockerignore = Dockerfiles\TestWrapper.Dockerfile.dockerignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
