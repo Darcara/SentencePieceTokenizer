@@ -61,8 +61,8 @@ public static class Helper {
 				CopyIfNecessary("./sentencepiece.lib","../../../../SentencePieceTokenizer/runtimes/win-x64/native/sentencepiece.lib");
 				break;
 			case "linux-x64":
-				CopyIfNecessary($"./{SentencePieceApi.LibraryName}.so",$"../../../../SentencePieceTokenizer/runtimes/win-x64/native/{SentencePieceApi.LibraryName}.so");
-				CopyIfNecessary("./sentencepiece.so","../../../../SentencePieceTokenizer/runtimes/win-x64/native/sentencepiece.so");
+				// CopyIfNecessary($"./{SentencePieceApi.LibraryName}.so",$"../../../../SentencePieceTokenizer/runtimes/linux-x64/native/{SentencePieceApi.LibraryName}.so");
+				// CopyIfNecessary("./sentencepiece.so","../../../../SentencePieceTokenizer/runtimes/linux-x64/native/sentencepiece.so");
 				break;
 			default: throw new InvalidOperationException($"Unsupported runtime id: {RuntimeInformation.RuntimeIdentifier}");
 		}

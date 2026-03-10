@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <ProjectGuid>DEFAC880-35FA-4D85-8A5F-00CE938854AA</ProjectGuid>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
@@ -17,7 +17,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageVersion>0.1.5</PackageVersion>
+        <PackageVersion>0.1.7</PackageVersion>
         <Title>SentencePieceTokenizer</Title>
         <PackageId>SentencePieceTokenizer</PackageId>
         <Authors>Darcara</Authors>
@@ -33,6 +33,7 @@
         <EmbedAllSources>true</EmbedAllSources>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PublishDocumentationFile>true</PublishDocumentationFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <DebugType>portable</DebugType>
     </PropertyGroup>
 
@@ -44,7 +45,7 @@
         <Content Include="..\.gitignore" Link="Solution Files/.gitignore" Pack="false"/>
         <Content Include="..\LICENSE" Link="Solution Files/LICENSE" Pack="true" PackagePath="."/>
         <Content Include="..\README.md" Link="Solution Files/README.md" Pack="true" PackagePath="README.md"/>
-        <Content Include="runtimes/linux-x64/native/libsentencepiece.so" Pack="true" PackagePath="runtimes/linux-x64/native/"/>
+        <Content Include="runtimes/linux-x64/native/libsentencepiece.so.0" Pack="true" PackagePath="runtimes/linux-x64/native/"/>
         <Content Include="runtimes/linux-x64/native/SentencePieceWrapper.so" Pack="true" PackagePath="runtimes/linux-x64/native/"/>
 
         <Content Include="runtimes/win-x64/native/sentencepiece.lib" Pack="true" PackagePath="runtimes/win-x64/native/"/>
@@ -54,8 +55,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="protobuf-net" Version="3.2.52" />
-        <PackageReference Include="System.Numerics.Tensors" Version="9.0.7" />
+        <PackageReference Include="protobuf-net" Version="3.2.56" />
+        <PackageReference Include="System.Numerics.Tensors" Version="10.0.3" />
     </ItemGroup>
 
 </Project>
